@@ -1,0 +1,63 @@
+@startuml
+!pragma layout smetana
+skinparam defaultFontName Arial
+skinparam defaultFontSize 14
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam componentStyle uml2
+skinparam componentBackgroundColor #F3F6FA
+skinparam componentBorderColor #40566D
+skinparam ArrowColor #40566D
+skinparam packageBackgroundColor white
+skinparam nodesep 35
+skinparam ranksep 45
+title Целевая архитектура SQLHunt
+actor Игрок
+actor Редактор
+component "Веб-клиент\nКаталог, SQL-редактор,\nвизуализатор схемы" as Web
+component "Панель управления\nделами · Django" as Admin
+component "Сервис ID · Go\nРегистрация, вход, токены" as ID
+package "Расследования · Go" {
+  component "HTTP-адаптер\nи обработчик очереди" as In
+  component "Сценарии\nДоступ к делу, схема, SQL,\nответ, прогресс" as Use
+  component "Домен\nДело, прогресс, награда" as Domain
+  component "Порты\nХранилище, очередь,\nисполнение, метаданные" as Ports
+  component "Адаптеры\nБД, очередь, движок" as Out
+  In --> Use
+  Use --> Domain
+  Use --> Ports
+  Out ..|> Ports
+}
+component "SQL-движок · Go\nОграничения и изоляция" as Engine
+component "Генератор данных\nСамостоятельный модуль" as Generator
+queue "Очередь и состояния\nSQL-заданий" as Queue
+database "Пользователи\nсервиса ID" as Users
+database "Дела, разрешения,\nпрогресс и XP" as Game
+database "Учебные данные\nПолицейский архив" as Training
+Игрок --> Web
+Редактор --> Admin
+Web --> ID : вход
+ID --> Users
+Web --> In : операции игрока
+Admin --> In : управление делами
+Admin --> Generator : параметры набора
+Generator --> Training : подготовленные данные
+Out --> Game
+Out --> Queue
+Queue <--> Engine : задания и результаты
+Engine --> Training : изолированная попытка
+Engine --> Game : ограничения дела
+Out --> Training : метаданные схемы
+note bottom of Generator
+  Общий формат данных.
+  Фиксированные параметры и seed.
+  Самостоятельный запуск для измерений.
+end note
+legend bottom
+  FR-01–FR-09 · NFR-01–NFR-07
+  Сплошные стрелки — обращения и зависимости.
+  Пунктир с треугольником — реализация портов адаптерами.
+  Взаимодействие панели с игровым API — предлагаемое решение.
+  Физический диалект учебной БД уточняется при завершении миграции.
+endlegend
+@enduml

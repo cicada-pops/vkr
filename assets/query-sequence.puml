@@ -1,0 +1,83 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam defaultFontSize 14
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam ArrowColor #40566D
+skinparam sequenceParticipantBackgroundColor #E3EAF3
+skinparam sequenceParticipantBorderColor #40566D
+skinparam sequenceGroupBackgroundColor #F3F6FA
+skinparam maxMessageSize 200
+hide footbox
+title Запрос игрока и завершение расследования
+participant "Веб-клиент\nигрока" as Client
+participant "Игровой API\nGo" as API
+database "Служебная\nБД" as DB
+queue "Очередь и\nсостояния заданий" as Queue
+participant "SQL-движок\nGo" as Engine
+note over Client, API
+  Игрок вошёл через ID и выбрал дело.
+  Клиент отправляет токен доступа.
+end note
+group Выполнение запроса · FR-02, FR-04 · NFR-01–NFR-03
+Client -> API : Выполнить SQL для выбранного дела
+API -> API : Проверить токен доступа
+API -> DB : Получить дело, XP и разрешённые таблицы
+DB --> API : Условия доступа и ограничения
+API -> API : Проверить XP, SELECT и таблицы
+break Запрос отклонён
+  API --> Client : Причина отказа
+end
+API -> Queue : Создать задание с user_id и case_id
+Queue --> API : Номер задания
+API --> Client : Принято, номер задания
+par Обработка задания
+Queue ->> Engine : Передать задание
+Engine -> DB : Повторно получить разрешения дела
+DB --> Engine : Актуальные ограничения
+Engine -> Engine : Проверить запрос и выполнить\nв изолированной учебной среде
+note right of Engine
+  Ограничение времени и объёма вывода.
+  Доступ к учебным таблицам.
+  Среда освобождается после попытки.
+end note
+alt Успешное выполнение
+  Engine -> Queue : Сохранить строки, колонки и признак усечения
+else Запрос запрещён, ошибка SQL или истёк лимит
+  Engine -> Queue : Сохранить ошибку выполнения
+end
+else Опрос состояния клиентом
+loop До получения конечного состояния
+  Client -> API : Получить состояние по номеру
+  API -> Queue : Прочитать задание
+  Queue --> API : Владелец, состояние и результат
+  API -> API : Проверить владельца
+  API --> Client : Состояние и результат либо отказ в доступе
+end
+end
+end
+group Отдельная сдача ответа · FR-05, FR-06 · NFR-04
+Client -> API : Отправить найденный ответ
+API -> API : Проверить токен доступа
+API -> DB : Начать транзакцию, заблокировать профиль\nи прогресс, прочитать дело
+DB --> API : XP, контрольный ответ и статус прохождения
+API -> API : Проверить доступ к делу
+break Доступ запрещён
+  API -> DB : Откатить транзакцию
+  API --> Client : Причина отказа
+end
+API -> API : Сравнить ответ
+alt Ответ верен и дело завершено впервые
+  API -> DB : Сохранить завершение и прибавить награду
+else Верный ответ уже был принят
+  API -> DB : Сохранить прежний XP
+else Ответ неверен
+  API -> DB : Сохранить прогресс без награды
+end
+API -> DB : Завершить транзакцию
+DB --> API : Изменения зафиксированы
+API --> Client : Результат проверки ответа
+Client -> API : Обновить профиль и каталог
+API --> Client : XP, прогресс и доступность дел
+end
+@enduml

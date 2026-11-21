@@ -1,0 +1,97 @@
+@startuml
+!pragma layout smetana
+skinparam defaultFontName Arial
+skinparam defaultFontSize 14
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam linetype ortho
+skinparam classBackgroundColor #F3F6FA
+skinparam classBorderColor #40566D
+skinparam ArrowColor #40566D
+hide circle
+title Учебная база «Полицейский архив»
+entity "Расследование\ncases" as Case {
+  * id <<PK>>
+  --
+  * description
+  * date_opened
+  * status
+}
+entity "Место преступления\ncrime_scene" as Scene {
+  * id <<PK>>
+  * case_id <<FK>>
+  --
+  * location
+  * date
+}
+entity "Улика\nevidence" as Evidence {
+  * id <<PK>>
+  * scene_id <<FK>>
+  --
+  * type
+  * description
+}
+entity "Человек\nperson" as Person {
+  * id <<PK>>
+  --
+  * name
+  * date_birth
+  * description
+}
+entity "Показание\nstatement" as Statement {
+  * id <<PK>>
+  * case_id <<FK>>
+  * person_id <<FK>>
+  --
+  * statement
+}
+entity "Подозреваемый\nsuspect" as Suspect {
+  * id <<PK>>
+  * person_id <<FK, UNIQUE>>
+  --
+  * status
+}
+entity "Участие в расследовании\nsuspect_cases" as Participation {
+  * id <<PK>>
+  * case_id <<FK>>
+  * suspect_id <<FK>>
+}
+entity "Алиби\nalibi" as Alibi {
+  * id <<PK>>
+  * case_id <<FK>>
+  * suspect_id <<FK, UNIQUE>>
+  --
+  * description
+  * status
+}
+entity "Обвинение\ncharge" as Charge {
+  * id <<PK>>
+  * suspect_id <<FK>>
+  * article_id <<FK>>
+  --
+  * status
+}
+entity "Статья\narticle" as Article {
+  * id <<PK>>
+  --
+  * description
+}
+Case ||--o{ Scene
+Scene ||--o{ Evidence
+Case ||--o{ Statement
+Person ||--o{ Statement
+Person ||--o| Suspect
+Case ||--o{ Participation
+Suspect ||--o{ Participation
+Case ||--o{ Alibi
+Suspect ||--o| Alibi
+Suspect ||--o{ Charge
+Article ||--o{ Charge
+legend bottom
+  Кратности и ключи сверены со схемой текущего учебного набора.
+  Для statement уникальна пара (case_id, person_id).
+  Для alibi текущая схема допускает не более одной записи на suspect_id.
+  Учебное задание из каталога и расследование cases — разные сущности.
+  FR-03, FR-04, FR-09 · NFR-02, NFR-05
+endlegend
+@enduml

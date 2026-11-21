@@ -1,0 +1,54 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam ArrowColor #40566D
+skinparam activityBackgroundColor #F3F6FA
+skinparam activityBorderColor #40566D
+skinparam activityDiamondBackgroundColor white
+skinparam activityDiamondBorderColor #40566D
+skinparam swimlaneTitleBackgroundColor #E3EAF3
+title TO-BE · Обучение через расследование в SQLHunt
+|Игрок|
+start
+:Войти и открыть каталог;
+|SQLHunt|
+:Показать прогресс и доступность дел\nпо текущему XP;
+|Игрок|
+:Выбрать доступное дело;
+|SQLHunt|
+:Показать сюжет, вопрос и схему\nразрешённых таблиц;
+|Игрок|
+:Изучить связи данных\nи сформулировать версию;
+repeat
+  repeat
+    :Составить или изменить SQL-запрос;
+    |SQLHunt|
+    :Проверить права, вид запроса\nи список таблиц;
+    if (Проверки пройдены?) then (да)
+      :Выполнить запрос изолированно\nс ограничением ресурсов;
+      :Показать строки результата\nили сообщение об ошибке;
+    else (нет)
+      :Сообщить причину отказа;
+    endif
+    |Игрок|
+    :Сопоставить результат с уликами\nи уточнить версию;
+  repeat while (Есть обоснованный ответ?) is (нет) not (да)
+  :Отправить найденный ответ;
+  |SQLHunt|
+  :Сравнить с контрольным ответом;
+  :Показать результат проверки ответа;
+repeat while (Ответ верен?) is (нет) not (да)
+|SQLHunt|
+:В одной транзакции сохранить завершение\nи начислить XP при первом решении;
+:Обновить доступность дел;
+|Игрок|
+:Перейти к следующему расследованию;
+stop
+legend bottom
+  FR-01–FR-07 · NFR-01–NFR-04
+  Показан сценарий до успешного решения.
+  Сохранённый прогресс доступен после следующего входа.
+endlegend
+@enduml

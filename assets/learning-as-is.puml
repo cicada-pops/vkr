@@ -1,0 +1,39 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam ArrowColor #40566D
+skinparam activityBackgroundColor #F3F6FA
+skinparam activityBorderColor #40566D
+skinparam activityDiamondBackgroundColor #FFFFFF
+skinparam activityDiamondBorderColor #40566D
+skinparam swimlaneTitleBackgroundColor #E3EAF3
+title AS-IS · Практика SQL в тренажёре Stepik
+|Учащийся|
+start
+:Войти и открыть упражнение;
+|Тренажёр|
+:Показать условие, учебные таблицы,\nтеорию и примеры;
+|Учащийся|
+:Изучить условие и данные;
+repeat
+  :Составить или исправить SQL-запрос;
+  :Отправить решение;
+  |Тренажёр|
+  :Выполнить запрос\nи автоматически проверить решение;
+  :Показать результат проверки;
+  |Учащийся|
+  :Разобрать результат и ошибки;
+repeat while (Решение принято?) is (нет) not (да)
+|Тренажёр|
+:Сохранить результат упражнения;
+|Учащийся|
+:Перейти к следующему заданию\nпо программе курса;
+stop
+legend bottom
+  Модель учебного сценария по ЛР 2 и описанию курса 63054.
+  Начальное условие — пользователь зарегистрирован.
+  Завершение — решение принято, результат сохранён.
+endlegend
+@enduml
