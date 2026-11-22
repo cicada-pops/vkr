@@ -59,7 +59,7 @@ entity "Участие в расследовании\nsuspect_cases" as Particip
 entity "Алиби\nalibi" as Alibi {
   * id <<PK>>
   * case_id <<FK>>
-  * suspect_id <<FK, UNIQUE>>
+  * suspect_id <<FK>>
   --
   * description
   * status
@@ -84,13 +84,12 @@ Person ||--o| Suspect
 Case ||--o{ Participation
 Suspect ||--o{ Participation
 Case ||--o{ Alibi
-Suspect ||--o| Alibi
+Suspect ||--o{ Alibi
 Suspect ||--o{ Charge
 Article ||--o{ Charge
 legend bottom
-  Кратности и ключи сверены со схемой текущего учебного набора.
   Для statement уникальна пара (case_id, person_id).
-  Для alibi текущая схема допускает не более одной записи на suspect_id.
+  Для alibi уникальна пара (case_id, suspect_id).
   Учебное задание из каталога и расследование cases — разные сущности.
   FR-03, FR-04, FR-09 · NFR-02, NFR-05
 endlegend

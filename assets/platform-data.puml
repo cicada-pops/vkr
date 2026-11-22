@@ -16,6 +16,7 @@ entity "Пользователь\nusers · сервис ID" as User {
   * username <<UNIQUE>>
   * email <<UNIQUE>>
   * password_hash
+  * role
 }
 entity "Профиль игрока\nplayer_profiles" as Profile {
   * user_id <<PK, ID пользователя>>
@@ -42,10 +43,22 @@ entity "Доступная таблица\ninvestigation_case_tables" as Table {
   * case_id <<PK, FK>>
   * table_name <<PK>>
 }
+entity "Задание SQL\nquery_jobs" as Job {
+  * id <<PK>>
+  * user_id <<FK>>
+  * case_id <<FK>>
+  --
+  * query_text
+  * status
+  * result_json
+  * error
+}
 User ||..o| Profile
 Profile ||--o{ Progress
 Case ||--o{ Progress
 Case ||--|{ Table
+Profile ||--o{ Job
+Case ||--o{ Job
 note bottom of Profile
   xp >= 0
   Профиль создаётся при первом
@@ -67,7 +80,7 @@ end note
 legend bottom
   PK — первичный ключ, FK — внешний ключ, UNIQUE — уникальное значение.
   Пунктир — логическая связь с сервисом ID, без межбазового FK.
-  В модели показаны поля, необходимые для FR-01, FR-02, FR-03, FR-05, FR-06, FR-08.
+  В модели показаны поля, необходимые для FR-01–FR-06 и FR-08.
   NFR-04 — уникальность прогресса и атомарное начисление награды.
 endlegend
 @enduml

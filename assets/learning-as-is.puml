@@ -9,7 +9,7 @@ skinparam activityBorderColor #40566D
 skinparam activityDiamondBackgroundColor #FFFFFF
 skinparam activityDiamondBorderColor #40566D
 skinparam swimlaneTitleBackgroundColor #E3EAF3
-title AS-IS · Практика SQL в тренажёре Stepik
+title AS-IS · Практика SQL в интерактивном тренажёре
 |Учащийся|
 start
 :Войти и открыть упражнение;
@@ -32,7 +32,6 @@ repeat while (Решение принято?) is (нет) not (да)
 :Перейти к следующему заданию\nпо программе курса;
 stop
 legend bottom
-  Модель учебного сценария по ЛР 2 и описанию курса 63054.
   Начальное условие — пользователь зарегистрирован.
   Завершение — решение принято, результат сохранён.
 endlegend
